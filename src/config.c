@@ -1,26 +1,73 @@
+/**
+ * @file config.c
+ * @brief Configuration file parser implementation
+ * 
+ * This file implements parsing of the configuration file format used by
+ * the solar system simulation. The format supports key=value pairs and
+ * hierarchical properties for celestial bodies.
+ */
+
 #include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+/**
+ * @brief Parse a comma-separated vector string
+ * 
+ * Converts a string in the format "x,y,z" into a Vector structure.
+ * Missing components default to 0.
+ * 
+ * @param value String to parse (format: "x,y,z")
+ * @return Vector parsed from the string
+ */
 static Vector parse_vector(const char *value) {
     Vector v = {0, 0, 0};
     sscanf(value, "%f,%f,%f", &v.x, &v.y, &v.z);
     return v;
 }
 
+/**
+ * @brief Parse a comma-separated color string
+ * 
+ * Converts a string in the format "r,g,b,a" into a Color structure.
+ * Each component should be in the range 0-255.
+ * 
+ * @param value String to parse (format: "r,g,b,a")
+ * @return Color parsed from the string
+ */
 static Color parse_color(const char *value) {
     Color c = {0, 0, 0, 0};
     sscanf(value, "%d,%d,%d,%d", &c.r, &c.g, &c.b, &c.a);
     return c;
 }
 
+/**
+ * @brief Load configuration from a file
+ * 
+ * Parses a configuration file with the following format:
+ * - Lines starting with '#' are comments
+ * - Empty lines are ignored
+ * - Format: key=value
+ * - Global settings: timestep, resolution, gravity, loglevel
+ * - Planet properties: planetN.property=value where N is 0-9
+ *   - Supported properties: mass, pos, mom, color, rad
+ * 
+ * Example:
+ *   timestep = 1
+ *   resolution = 720
+ *   planet0.mass = 1000.0
+ *   planet0.pos = 0.0,0.0,0.0
+ * 
+ * @param filename Path to the configuration file
+ * @param cfg Pointer to Config structure to populate
+ * @return true if file was successfully parsed, false on error
+ */
 bool load_config(const char *filename, Config *cfg) {
     FILE *fp = fopen(filename, "r");
     if (!fp) return false;
 
     char line[256];
-    // int current_planet = -1;
 
     while (fgets(line, sizeof(line), fp)) {
         if (line[0] == '#' || strlen(line) < 3) continue;
@@ -28,7 +75,7 @@ bool load_config(const char *filename, Config *cfg) {
         char key[64], value[128];
         if (sscanf(line, "%[^=]=%[^\n]", key, value) != 2) continue;
 
-        // Trim
+        // Trim whitespace from key and value
         char *k = strtok(key, " \t\r\n");
         char *v = strtok(value, " \t\r\n");
 

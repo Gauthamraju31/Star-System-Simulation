@@ -1,7 +1,28 @@
+/**
+ * @file core.c
+ * @brief Implementation of sphere lifecycle management
+ * 
+ * This file implements the creation and destruction of celestial bodies
+ * (spheres) used in the solar system simulation.
+ */
+
 #include "core.h"
 
 // ---- Sphere Lifecycle ----
 
+/**
+ * @brief Create a new sphere with the specified properties
+ * 
+ * Allocates memory for a new sphere and initializes all its properties.
+ * The force is initialized to zero, and trail rendering is disabled by default.
+ * 
+ * @param position Initial position in 3D space
+ * @param radius Visual radius of the sphere
+ * @param color RGBA color for rendering
+ * @param mass Mass of the celestial body
+ * @param momentum Initial momentum vector
+ * @return Pointer to newly created Sphere, or NULL if allocation fails
+ */
 Sphere *sphere_create(PosVec position, float radius, Color color, float mass, MomVec momentum) {
   Sphere *s = (Sphere *)malloc(sizeof(Sphere));
   if (!s) {
@@ -20,6 +41,14 @@ Sphere *sphere_create(PosVec position, float radius, Color color, float mass, Mo
   return s;
 }
 
+/**
+ * @brief Free memory allocated for a sphere
+ * 
+ * Safely deallocates a sphere and its associated trail data.
+ * Does nothing if passed a NULL pointer.
+ * 
+ * @param s Pointer to the sphere to free
+ */
 void sphere_free(Sphere *s) {
   if (s) {
     if (s->trail) free(s->trail);

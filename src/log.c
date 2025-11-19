@@ -1,9 +1,35 @@
+/**
+ * @file log.c
+ * @brief Implementation of the logging system
+ * 
+ * This file implements the logging functionality with colored output,
+ * timestamps, and configurable severity levels.
+ */
+
 #include "log.h"
 #include <stdarg.h>
 #include <time.h>
 
+/** @brief Global variable controlling the current log level */
 LogLevel CURRENT_LOG_LEVEL = LOG_INFO;
 
+/**
+ * @brief Format and output a log message
+ * 
+ * This function formats a log message with the following components:
+ * - Color-coded severity level
+ * - Timestamp (YYYY-MM-DD HH:MM:SS format)
+ * - Source file and line number
+ * - User-provided message with printf-style formatting
+ * 
+ * Messages are filtered based on CURRENT_LOG_LEVEL.
+ * 
+ * @param level Severity level of the message
+ * @param file Source file name where the log was called
+ * @param line Line number where the log was called
+ * @param fmt Printf-style format string
+ * @param ... Variable arguments for the format string
+ */
 void log_message(LogLevel level, const char *file, int line, const char *fmt, ...) {
     if (level < CURRENT_LOG_LEVEL) return;
 

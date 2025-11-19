@@ -1,8 +1,29 @@
+/**
+ * @file x11.c
+ * @brief X11 window management and event handling implementation
+ * 
+ * This file implements the X11-based graphical interface for the solar
+ * system simulation, including window creation, event handling, and
+ * rendering functions.
+ */
+
 #include "x11.h"
 
-
+/** @brief External reference to the global running flag */
 extern bool running;
 
+/**
+ * @brief Initialize X11 display and create the application window
+ * 
+ * Opens a connection to the X display, creates a simple window with
+ * specified dimensions, sets up event handling, and prepares the
+ * graphics context for drawing.
+ * 
+ * @param x11 Pointer to X11Disp structure to initialize
+ * @param width Width of the window in pixels
+ * @param height Height of the window in pixels
+ * @return true if initialization succeeded, false on error
+ */
 bool init_x(X11Disp *x11, unsigned int width, unsigned int height) {
     if (!x11) return false;
 
@@ -50,6 +71,16 @@ bool init_x(X11Disp *x11, unsigned int width, unsigned int height) {
     return true;
 }
 
+/**
+ * @brief Process pending X11 events
+ * 
+ * Handles all pending events in the X11 event queue. Currently supports:
+ * - KeyPress events: 'q' key quits the application
+ * - ClientMessage events: Window close button
+ * 
+ * @param display X11 display connection
+ * @param window Window handle for which to process events
+ */
 void handle_x11_events(Display *display, Window window) {
     XEvent event;
     while (XPending(display)) {
@@ -71,7 +102,15 @@ void handle_x11_events(Display *display, Window window) {
     }
 }
 
-
+/**
+ * @brief Clean up and close the X11 display
+ * 
+ * Frees the graphics context, destroys the window, and closes the
+ * display connection. Safe to call multiple times or with partially
+ * initialized structures.
+ * 
+ * @param x11 Pointer to X11Disp structure to clean up
+ */
 void close_x(X11Disp *x11) {
     if (!x11 || !x11->display) return;
 
@@ -82,6 +121,14 @@ void close_x(X11Disp *x11) {
     x11->display = NULL;
 }
 
+/**
+ * @brief Clear the window in preparation for redrawing
+ * 
+ * Clears the entire window to the background color, preparing
+ * it for the next frame of rendering.
+ * 
+ * @param x11 Pointer to X11Disp structure
+ */
 void redraw_x(X11Disp *x11) {
     if (!x11 || !x11->display) return;
     XClearWindow(x11->display, x11->window);
